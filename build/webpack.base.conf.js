@@ -1,5 +1,6 @@
 var path = require('path')
 var utils = require('./utils')
+var pwUtils = require('./pw-utils')
 var config = require('../config')
 var vueLoaderConfig = require('./vue-loader.conf')
 
@@ -8,9 +9,7 @@ function resolve (dir) {
 }
 
 module.exports = {
-  entry: {
-    app: './src/main.js'
-  },
+  entry: pwUtils.getEntries('./src/html/**/*.html.vue'),
   output: {
     path: config.build.assetsRoot,
     filename: '[name].js',
