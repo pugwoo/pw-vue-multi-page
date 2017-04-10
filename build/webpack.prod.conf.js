@@ -1,5 +1,6 @@
 var path = require('path')
 var utils = require('./utils')
+var pwUtils = require('./pw-utils')
 var webpack = require('webpack')
 var config = require('../config')
 var merge = require('webpack-merge')
@@ -8,6 +9,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
 var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
+var CleanPlugin = require('clean-webpack-plugin') //webpack插件，用于清除目录文件
 
 var env = config.build.env
 
@@ -33,7 +35,7 @@ var webpackConfig = merge(baseWebpackConfig, {
       compress: {
         warnings: false
       },
-      sourceMap: true
+      sourceMap: false // 线上环境不显示源码
     }),
     // extract css into its own file
     new ExtractTextPlugin({
@@ -46,36 +48,18 @@ var webpackConfig = merge(baseWebpackConfig, {
         safe: true
       }
     }),
+    new CleanPlugin(['../dist']), //清空生成目录
+    new webpack.optimize.OccurrenceOrderPlugin(),
     // generate dist index.html with correct asset hash for caching.
     // you can customize output by editing /index.html
     // see https://github.com/ampedandwired/html-webpack-plugin
-    new HtmlWebpackPlugin({
-      filename: config.build.index,
-      template: 'index.html',
-      inject: true,
-      minify: {
-        removeComments: true,
-        collapseWhitespace: true,
-        removeAttributeQuotes: true
-        // more options:
-        // https://github.com/kangax/html-minifier#options-quick-reference
-      },
-      // necessary to consistently work with multiple chunks via CommonsChunkPlugin
-      chunksSortMode: 'dependency'
-    }),
+    // 删除原HtmlWebpackPlugin
     // split vendor js into its own file
-    new webpack.optimize.CommonsChunkPlugin({
+    // 删除原第一个CommonsChunkPlugin
+    new webpack.optimize.CommonsChunkPlugin({ // 自定义配置
       name: 'vendor',
-      minChunks: function (module, count) {
-        // any required modules inside node_modules are extracted to vendor
-        return (
-          module.resource &&
-          /\.js$/.test(module.resource) &&
-          module.resource.indexOf(
-            path.join(__dirname, '../node_modules')
-          ) === 0
-        )
-      }
+      chunks: pwUtils.chunks(),
+      minChunks:5
     }),
     // extract webpack runtime and module manifest to its own file in order to
     // prevent vendor hash from being updated whenever app bundle is updated
@@ -91,7 +75,7 @@ var webpackConfig = merge(baseWebpackConfig, {
         ignore: ['.*']
       }
     ])
-  ]
+  ].concat(pwUtils.getHtmlWebpackPluginProd()) // 增加动态的HtmlWebpackPlugin
 })
 
 if (config.build.productionGzip) {

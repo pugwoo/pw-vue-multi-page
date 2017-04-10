@@ -69,10 +69,38 @@ exports.getHtmlWebpackPlugin = function() {
     list.push(new HtmlWebpackPlugin({ // https://github.com/ampedandwired/html-webpack-plugin
       filename: key,
       template: './src/layout/default.html', // TODO 还没有支持配置layout的方式
-      chunks: [key],
+      chunks: [key, 'vendor', 'manifest'], // 每个html引用的js模块
       inject: true
     }))
   }
 
   return list;
+}
+
+exports.getHtmlWebpackPluginProd = function() {
+
+  var list = [];
+  for(var key in entries){
+    list.push(new HtmlWebpackPlugin({ // https://github.com/ampedandwired/html-webpack-plugin
+      filename: key,
+      template: './src/layout/default.html', // TODO 还没有支持配置layout的方式
+      chunks: [key, 'vendor', 'manifest'], // 每个html引用的js模块
+      inject: true,
+      minify: {
+        removeComments: true,//去掉注释
+        collapseWhitespace: true,//去空格
+        removeAttributeQuotes: true//去换行
+        // more options:
+        // https://github.com/kangax/html-minifier#options-quick-reference
+      },
+      // necessary to consistently work with multiple chunks via CommonsChunkPlugin
+      chunksSortMode: 'dependency'
+    }))
+  }
+  return list;
+}
+
+exports.chunks = function(){
+  var chunks = Object.keys(entries);
+  return chunks;
 }
