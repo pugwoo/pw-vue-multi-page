@@ -43,19 +43,25 @@ new Vue({\n\
 
   glob.sync(globPath).forEach(function(entry) {
 
-    // TODO 代码还需要优化，主要是路径path
+    // 获取生成js入口文件
+    var reg = /([^\/]*\/){3}/;
+    var pathEntry = path.dirname(entry).replace(reg,"");
 
-    var jsEntry = "./" + _generate_entry + "/" + path.dirname(entry).substring(11) +
-                  (path.dirname(entry).substring(11) ? "/" : "" ) +
-                  path.basename(entry, ".html.vue") + ".js";
+    if(pathEntry.startsWith("./src/")) { // ./src/开头仅出现在src/html目录下第一级目录下的文件
+        pathEntry='';
+    }
 
+    var jsEntry = "./" + _generate_entry + "/" + pathEntry + (pathEntry ? "/" : "" ) + path.basename(entry, ".html.vue") + ".js";
+
+    //创建文件、目录
     fs.ensureDirSync(path.dirname(jsEntry));
-    var VUE_PATH = getUpDirStr(path.dirname(entry))
-          + path.dirname(entry) + "/" +path.basename(entry, ".vue");
+    var VUE_PATH = getUpDirStr(path.dirname(entry)) + path.dirname(entry) + "/" +path.basename(entry, ".vue");
+    //同步版的fs.writeFile() 将entryJSContent写入js入口文件
     fs.writeFileSync(jsEntry, entryJSContent.replace('VUE_PATH', VUE_PATH), {}, showError);
 
-    var entryName = path.dirname(entry).substring(11) +
-            (path.dirname(entry).substring(11) ? "/" : "" ) + path.basename(entry, ".vue");
+    //获取入口名称
+    var entryName = pathEntry + (pathEntry ? "/" : "" ) + path.basename(entry, ".vue");
+    //生成正确的html和js路径
     entries[entryName] = jsEntry;
   });
 

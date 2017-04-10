@@ -9,7 +9,7 @@ function resolve (dir) {
 }
 
 module.exports = {
-  entry: pwUtils.getEntries('./src/html/**/*.html.vue'),
+  entry: pwUtils.getEntries('./src/html/**/*.html.vue'), /*约定html.vue文件必须放在src/的一级目录下*/
   output: {
     path: config.build.assetsRoot,
     filename: '[name].js',

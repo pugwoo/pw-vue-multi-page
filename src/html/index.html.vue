@@ -8,6 +8,8 @@
 <script>
   import Hello from '../components/Hello'
 
+  document.title = "这是标题"
+
   export default {
     name: 'app',
     components: {
