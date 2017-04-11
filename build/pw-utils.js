@@ -74,7 +74,7 @@ exports.getHtmlWebpackPlugin = function() {
   for(var key in entries){
     list.push(new HtmlWebpackPlugin({ // https://github.com/ampedandwired/html-webpack-plugin
       filename: key,
-      template: './src/layout/default.html', // TODO 还没有支持配置layout的方式
+      template: './src/layout/default.html', // 目前所有entry共用一个layout，可以按需修改
       chunks: [key, 'vendor', 'manifest'], // 每个html引用的js模块
       inject: true
     }))
@@ -89,7 +89,7 @@ exports.getHtmlWebpackPluginProd = function() {
   for(var key in entries){
     list.push(new HtmlWebpackPlugin({ // https://github.com/ampedandwired/html-webpack-plugin
       filename: key,
-      template: './src/layout/default.html', // TODO 还没有支持配置layout的方式
+      template: './src/layout/default.html', // 目前所有entry共用一个layout，可以按需修改
       chunks: [key, 'vendor', 'manifest'], // 每个html引用的js模块
       inject: true,
       minify: {
