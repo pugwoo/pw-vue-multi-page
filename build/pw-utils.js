@@ -26,18 +26,7 @@ exports.getEntries = function (globPath) {
 
   var _generate_entry = "_generate_entry";
 
-  var entryJSContent = "\
-import Vue from 'vue' \n\
-import App from 'VUE_PATH' \n\
-\n\
-Vue.config.productionTip = false; \n\
-\n\
-new Vue({\n\
-  el: '#app',\n\
-  template: '<App/>',\n\
-  components: { App }\n\
-})\n\
-";
+  var entryJSContent = fs.readFileSync('./src/layout/entry.js','utf8');
 
   fs.removeSync('./' + _generate_entry);
 
@@ -51,13 +40,15 @@ new Vue({\n\
         pathEntry='';
     }
 
-    var jsEntry = "./" + _generate_entry + "/" + pathEntry + (pathEntry ? "/" : "" ) + path.basename(entry, ".html.vue") + ".js";
+    var jsEntry = "./" + _generate_entry + "/" + pathEntry + (pathEntry ? "/" : "" )
+                  + path.basename(entry, ".html.vue") + ".js";
 
     //创建文件、目录
     fs.ensureDirSync(path.dirname(jsEntry));
-    var VUE_PATH = getUpDirStr(path.dirname(entry)) + path.dirname(entry) + "/" +path.basename(entry, ".vue");
+    var VUE_PATH = getUpDirStr(path.dirname(entry)) + path.dirname(entry)
+                   + "/" +path.basename(entry, ".vue");
     //同步版的fs.writeFile() 将entryJSContent写入js入口文件
-    fs.writeFileSync(jsEntry, entryJSContent.replace('VUE_PATH', VUE_PATH), {}, showError);
+    fs.writeFileSync(jsEntry, entryJSContent.replace('__VUE_PATH__', VUE_PATH), {}, showError);
 
     //获取入口名称
     var entryName = pathEntry + (pathEntry ? "/" : "" ) + path.basename(entry, ".vue");
