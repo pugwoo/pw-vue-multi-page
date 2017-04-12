@@ -2,6 +2,7 @@
   <div id="app">
     <img src="../assets/logo.png">
     <hello></hello>
+    <button @click="download">点击下载src/test.html</button>
   </div>
 </template>
 
@@ -14,6 +15,14 @@
     name: 'app',
     components: {
       Hello
+    },
+    methods: {
+        download: function() {
+            this.$http.get("./src/test.html").then(function(resp){
+                console.log(resp.body);
+                alert("下载成功，请看console.log")
+            })
+        }
     }
   }
 </script>
