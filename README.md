@@ -2,6 +2,14 @@
 
 > A better vue multi-page project demo.
 
+这是一个非常简单的vue webpack多页面项目模板。
+
+只要往`src/html`目录中增加以`.html.vue`结尾的文件，即可渲染为页面。
+
+开发运行：`npm install && npm run dev`
+
+生成静态文件：`npm run build`
+
 ## Build Setup
 
 ``` bash
