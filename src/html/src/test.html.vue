@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <div class="title">你好，世界</div>
     <hello></hello>
   </div>
 </template>
@@ -15,7 +16,7 @@
   }
 </script>
 
-<style>
+<style lang="scss">
   #app {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -23,5 +24,8 @@
     text-align: center;
     color: #2c3e50;
     margin-top: 60px;
+  }
+  .title {
+    color: red;
   }
 </style>
