@@ -23,3 +23,17 @@
 
 模板分别引入了element-ui和we-vue两个vue UI组件库作为示例，分别在`element`和`we-vue`分支中。可以切换分支查看。
 
+## 3. 关于style的支持语法
+
+目前支持现在最主流写法兼容最好的scss:
+```
+    "sass-loader": "^6.0.6",
+    "node-sass": "^4.5.3",
+```
+
+如果需要支持stylus，只需要package.json中加入：
+
+```
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.1",
+```
