@@ -2,8 +2,8 @@ import Vue from 'vue'
 import VueResource from 'vue-resource'
 
 // weui vue封装
-import 'weui/dist/style/weui.css'
 import WeVue from 'we-vue'
+import 'we-vue/lib/style.css'
 
 import App from '__VUE_PATH__'
 
