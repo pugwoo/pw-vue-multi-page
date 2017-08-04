@@ -6,6 +6,7 @@ var path = require('path');
 var fs = require('fs-extra');
 var glob = require('glob');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var layoutConf = require('../src/layout/layout.conf')
 
 function showError(error) {
   console.error(error);
@@ -26,11 +27,29 @@ exports.getEntries = function (globPath) {
 
   var _generate_entry = "_generate_entry";
 
+  // 默认 entry.js
   var entryJSContent = fs.readFileSync('./src/layout/entry.js','utf8');
 
   fs.removeSync('./' + _generate_entry);
 
   glob.sync(globPath).forEach(function(entry) {
+
+console.log("-------------------------" + entry)
+
+    var _entryJSContent = entryJSContent
+    for(var key in layoutConf) {
+      if(new RegExp(key).test(entry)) {
+        var value = layoutConf[key]
+        if(typeof value == 'string') {
+          if(value.endsWith('.js')) {
+            _entryJSContent = fs.readFileSync('./src/layout/' + value,'utf8');
+          }
+        } else if (Object.prototype.toString.call( value ) === '[object Array]') {
+
+        }
+        console.log('----match-----' + entry)
+      }
+    }
 
     // 获取生成js入口文件
     var reg = /([^\/]*\/){3}/;
@@ -48,7 +67,7 @@ exports.getEntries = function (globPath) {
     var VUE_PATH = getUpDirStr(path.dirname(entry)) + path.dirname(entry)
                    + "/" +path.basename(entry, ".vue");
     //同步版的fs.writeFile() 将entryJSContent写入js入口文件
-    fs.writeFileSync(jsEntry, entryJSContent.replace('__VUE_PATH__', VUE_PATH), {}, showError);
+    fs.writeFileSync(jsEntry, _entryJSContent.replace('__VUE_PATH__', VUE_PATH), {}, showError);
 
     //获取入口名称
     var entryName = pathEntry + (pathEntry ? "/" : "" ) + path.basename(entry, ".vue");
