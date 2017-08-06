@@ -26,28 +26,28 @@ var entries = {};
 exports.getEntries = function (globPath) {
 
   var _generate_entry = "_generate_entry";
+  fs.removeSync('./' + _generate_entry);
 
   // 默认 entry.js
   var entryJSContent = fs.readFileSync('./src/layout/entry.js','utf8');
-
-  fs.removeSync('./' + _generate_entry);
-
   glob.sync(globPath).forEach(function(entry) {
 
-console.log("-------------------------" + entry)
-
+    // 支持可配置entry.js
     var _entryJSContent = entryJSContent
     for(var key in layoutConf) {
       if(new RegExp(key).test(entry)) {
         var value = layoutConf[key]
-        if(typeof value == 'string') {
-          if(value.endsWith('.js')) {
-            _entryJSContent = fs.readFileSync('./src/layout/' + value,'utf8');
-          }
+        if(typeof value == 'string' && value.endsWith('.js')) {
+          _entryJSContent = fs.readFileSync('./src/layout/' + value, 'utf8');
         } else if (Object.prototype.toString.call( value ) === '[object Array]') {
-
+          for(var index in value) {
+            if(typeof value[index] == 'string' && value[index].endsWith('.js')) {
+              _entryJSContent = fs.readFileSync('./src/layout/' + value[index], 'utf8');
+              break;
+            }
+          }
         }
-        console.log('----match-----' + entry)
+        break;
       }
     }
 
