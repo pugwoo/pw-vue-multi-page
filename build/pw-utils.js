@@ -81,11 +81,31 @@ exports.getEntries = function (globPath) {
 exports.getHtmlWebpackPlugin = function() {
 
   var list = [];
-  for(var key in entries){
+  for(var entry in entries){
+
+    // 支持可配置layout html
+    var template = './src/layout/default.html'
+    for(var key in layoutConf) {
+      if(new RegExp(key).test(entry)) {
+        var value = layoutConf[key]
+        if(typeof value == 'string' && value.endsWith('.html')) {
+          template = './src/layout/' + value;
+        } else if (Object.prototype.toString.call( value ) === '[object Array]') {
+          for(var index in value) {
+            if(typeof value[index] == 'string' && value[index].endsWith('.html')) {
+              template = './src/layout/' + value[index];
+              break;
+            }
+          }
+        }
+        break;
+      }
+    }
+
     list.push(new HtmlWebpackPlugin({ // https://github.com/ampedandwired/html-webpack-plugin
-      filename: key,
-      template: './src/layout/default.html', // 目前所有entry共用一个layout，可以按需修改
-      chunks: [key, 'vendor', 'manifest'], // 每个html引用的js模块
+      filename: entry,
+      template: template, // 目前所有entry共用一个layout，可以按需修改
+      chunks: [entry, 'vendor', 'manifest'], // 每个html引用的js模块
       inject: true
     }))
   }
@@ -96,11 +116,31 @@ exports.getHtmlWebpackPlugin = function() {
 exports.getHtmlWebpackPluginProd = function() {
 
   var list = [];
-  for(var key in entries){
+  for(var entry in entries){
+
+    // 支持可配置layout html
+    var template = './src/layout/default.html'
+    for(var key in layoutConf) {
+      if(new RegExp(key).test(entry)) {
+        var value = layoutConf[key]
+        if(typeof value == 'string' && value.endsWith('.html')) {
+          template = './src/layout/' + value;
+        } else if (Object.prototype.toString.call( value ) === '[object Array]') {
+          for(var index in value) {
+            if(typeof value[index] == 'string' && value[index].endsWith('.html')) {
+              template = './src/layout/' + value[index];
+              break;
+            }
+          }
+        }
+        break;
+      }
+    }
+
     list.push(new HtmlWebpackPlugin({ // https://github.com/ampedandwired/html-webpack-plugin
-      filename: key,
-      template: './src/layout/default.html', // 目前所有entry共用一个layout，可以按需修改
-      chunks: [key, 'vendor', 'manifest'], // 每个html引用的js模块
+      filename: entry,
+      template: template, // 目前所有entry共用一个layout，可以按需修改
+      chunks: [entry, 'vendor', 'manifest'], // 每个html引用的js模块
       inject: true,
       minify: {
         removeComments: true,//去掉注释

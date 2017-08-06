@@ -7,5 +7,5 @@
  */
 
 module.exports = {
-  // '\./src/html/m/.*': './entry.js' // 示例指定某个目录使用某个entry.js
+  // '\./src/html/m/.*': ['./entry.js', './default.html'] // 示例指定某个目录使用某个entry.js
 }
