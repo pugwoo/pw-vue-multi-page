@@ -23,33 +23,32 @@ function getUpDirStr(dir) { // dir需要以./src/html开头
 
 var entries = {};
 
+function getLayoutPath(entry, defaultPath, suffix) {
+  for(var key in layoutConf) {
+    if(new RegExp(key).test(entry)) {
+      var value = layoutConf[key]
+      if(typeof value == 'string' && value.endsWith(suffix)) {
+        return './src/layout/' + value
+      } else if (Object.prototype.toString.call( value ) === '[object Array]') {
+        for(var index in value) {
+          if(typeof value[index] == 'string' && value[index].endsWith(suffix))
+            return './src/layout/' + value[index]
+        }
+      }
+    }
+  }
+  return defaultPath
+}
+
 exports.getEntries = function (globPath) {
 
   var _generate_entry = "_generate_entry";
   fs.removeSync('./' + _generate_entry);
 
-  // 默认 entry.js
-  var entryJSContent = fs.readFileSync('./src/layout/entry.js','utf8');
   glob.sync(globPath).forEach(function(entry) {
 
-    // 支持可配置entry.js
-    var _entryJSContent = entryJSContent
-    for(var key in layoutConf) {
-      if(new RegExp(key).test(entry)) {
-        var value = layoutConf[key]
-        if(typeof value == 'string' && value.endsWith('.js')) {
-          _entryJSContent = fs.readFileSync('./src/layout/' + value, 'utf8');
-        } else if (Object.prototype.toString.call( value ) === '[object Array]') {
-          for(var index in value) {
-            if(typeof value[index] == 'string' && value[index].endsWith('.js')) {
-              _entryJSContent = fs.readFileSync('./src/layout/' + value[index], 'utf8');
-              break;
-            }
-          }
-        }
-        break;
-      }
-    }
+    var entryJsPath = getLayoutPath(entry, './src/layout/entry.js', '.js')
+    var entryJSContent = fs.readFileSync(entryJsPath, 'utf8');
 
     // 获取生成js入口文件
     var reg = /([^\/]*\/){3}/;
@@ -67,7 +66,7 @@ exports.getEntries = function (globPath) {
     var VUE_PATH = getUpDirStr(path.dirname(entry)) + path.dirname(entry)
                    + "/" +path.basename(entry, ".vue");
     //同步版的fs.writeFile() 将entryJSContent写入js入口文件
-    fs.writeFileSync(jsEntry, _entryJSContent.replace('__VUE_PATH__', VUE_PATH), {}, showError);
+    fs.writeFileSync(jsEntry, entryJSContent.replace('__VUE_PATH__', VUE_PATH), {}, showError);
 
     //获取入口名称
     var entryName = pathEntry + (pathEntry ? "/" : "" ) + path.basename(entry, ".vue");
@@ -78,29 +77,14 @@ exports.getEntries = function (globPath) {
   return  JSON.parse(JSON.stringify(entries));
 }
 
+
+
 exports.getHtmlWebpackPlugin = function() {
 
   var list = [];
   for(var entry in entries){
-
     // 支持可配置layout html
-    var template = './src/layout/default.html'
-    for(var key in layoutConf) {
-      if(new RegExp(key).test(entry)) {
-        var value = layoutConf[key]
-        if(typeof value == 'string' && value.endsWith('.html')) {
-          template = './src/layout/' + value;
-        } else if (Object.prototype.toString.call( value ) === '[object Array]') {
-          for(var index in value) {
-            if(typeof value[index] == 'string' && value[index].endsWith('.html')) {
-              template = './src/layout/' + value[index];
-              break;
-            }
-          }
-        }
-        break;
-      }
-    }
+    var template = getLayoutPath(entry, './src/layout/default.html', '.html')
 
     list.push(new HtmlWebpackPlugin({ // https://github.com/ampedandwired/html-webpack-plugin
       filename: entry,
@@ -117,25 +101,8 @@ exports.getHtmlWebpackPluginProd = function() {
 
   var list = [];
   for(var entry in entries){
-
     // 支持可配置layout html
-    var template = './src/layout/default.html'
-    for(var key in layoutConf) {
-      if(new RegExp(key).test(entry)) {
-        var value = layoutConf[key]
-        if(typeof value == 'string' && value.endsWith('.html')) {
-          template = './src/layout/' + value;
-        } else if (Object.prototype.toString.call( value ) === '[object Array]') {
-          for(var index in value) {
-            if(typeof value[index] == 'string' && value[index].endsWith('.html')) {
-              template = './src/layout/' + value[index];
-              break;
-            }
-          }
-        }
-        break;
-      }
-    }
+    var template = getLayoutPath(entry, './src/layout/default.html', '.html')
 
     list.push(new HtmlWebpackPlugin({ // https://github.com/ampedandwired/html-webpack-plugin
       filename: entry,
