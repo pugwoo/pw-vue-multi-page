@@ -6,6 +6,7 @@ var path = require('path');
 var fs = require('fs-extra');
 var glob = require('glob');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var layoutConf = require('../src/layout/layout.conf')
 
 function showError(error) {
   console.error(error);
@@ -22,15 +23,32 @@ function getUpDirStr(dir) { // dir需要以./src/html开头
 
 var entries = {};
 
+function getLayoutPath(entry, defaultPath, suffix) {
+  for(var key in layoutConf) {
+    if(new RegExp(key).test(entry)) {
+      var value = layoutConf[key]
+      if(typeof value == 'string' && value.endsWith(suffix)) {
+        return './src/layout/' + value
+      } else if (Object.prototype.toString.call( value ) === '[object Array]') {
+        for(var index in value) {
+          if(typeof value[index] == 'string' && value[index].endsWith(suffix))
+            return './src/layout/' + value[index]
+        }
+      }
+    }
+  }
+  return defaultPath
+}
+
 exports.getEntries = function (globPath) {
 
   var _generate_entry = "_generate_entry";
-
-  var entryJSContent = fs.readFileSync('./src/layout/entry.js','utf8');
-
   fs.removeSync('./' + _generate_entry);
 
   glob.sync(globPath).forEach(function(entry) {
+
+    var entryJsPath = getLayoutPath(entry, './src/layout/entry.js', '.js')
+    var entryJSContent = fs.readFileSync(entryJsPath, 'utf8');
 
     // 获取生成js入口文件
     var reg = /([^\/]*\/){3}/;
@@ -59,14 +77,19 @@ exports.getEntries = function (globPath) {
   return  JSON.parse(JSON.stringify(entries));
 }
 
+
+
 exports.getHtmlWebpackPlugin = function() {
 
   var list = [];
-  for(var key in entries){
+  for(var entry in entries){
+    // 支持可配置layout html
+    var template = getLayoutPath(entry, './src/layout/default.html', '.html')
+
     list.push(new HtmlWebpackPlugin({ // https://github.com/ampedandwired/html-webpack-plugin
-      filename: key,
-      template: './src/layout/default.html', // 目前所有entry共用一个layout，可以按需修改
-      chunks: [key, 'vendor', 'manifest'], // 每个html引用的js模块
+      filename: entry,
+      template: template, // 目前所有entry共用一个layout，可以按需修改
+      chunks: [entry, 'vendor', 'manifest'], // 每个html引用的js模块
       inject: true
     }))
   }
@@ -77,11 +100,14 @@ exports.getHtmlWebpackPlugin = function() {
 exports.getHtmlWebpackPluginProd = function() {
 
   var list = [];
-  for(var key in entries){
+  for(var entry in entries){
+    // 支持可配置layout html
+    var template = getLayoutPath(entry, './src/layout/default.html', '.html')
+
     list.push(new HtmlWebpackPlugin({ // https://github.com/ampedandwired/html-webpack-plugin
-      filename: key,
-      template: './src/layout/default.html', // 目前所有entry共用一个layout，可以按需修改
-      chunks: [key, 'vendor', 'manifest'], // 每个html引用的js模块
+      filename: entry,
+      template: template, // 目前所有entry共用一个layout，可以按需修改
+      chunks: [entry, 'vendor', 'manifest'], // 每个html引用的js模块
       inject: true,
       minify: {
         removeComments: true,//去掉注释
