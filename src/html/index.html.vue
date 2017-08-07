@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div class="app">
     <img src="../assets/logo.png">
     <hello></hello>
     <button @click="download">点击下载src/test.html</button>
@@ -28,7 +28,7 @@
 </script>
 
 <style>
-  #app {
+  .app {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
